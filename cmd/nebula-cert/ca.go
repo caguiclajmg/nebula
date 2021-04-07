@@ -110,7 +110,7 @@ func ca(args []string, out io.Writer, errOut io.Writer) error {
 
 	nc := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:      *cf.name,
+			Names:     strings.Split(*cf.name, ","),
 			Groups:    groups,
 			Ips:       ips,
 			Subnets:   subnets,

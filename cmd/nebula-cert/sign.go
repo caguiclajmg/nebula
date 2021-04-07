@@ -152,7 +152,7 @@ func signCert(args []string, out io.Writer, errOut io.Writer) error {
 
 	nc := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:      *sf.name,
+			Names:     strings.Split(*sf.name, ","),
 			Ips:       []*net.IPNet{ipNet},
 			Groups:    groups,
 			Subnets:   subnets,

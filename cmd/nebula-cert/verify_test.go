@@ -70,7 +70,7 @@ func Test_verify(t *testing.T) {
 	caPub, caPriv, _ := ed25519.GenerateKey(rand.Reader)
 	ca := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:      "test-ca",
+			Names:     []string{"test-ca"},
 			NotBefore: time.Now().Add(time.Hour * -1),
 			NotAfter:  time.Now().Add(time.Hour),
 			PublicKey: caPub,
@@ -108,7 +108,7 @@ func Test_verify(t *testing.T) {
 	signer, _ := ca.Sha256Sum()
 	crt := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:      "test-cert",
+			Names:     []string{"test-cert"},
 			NotBefore: time.Now().Add(time.Hour * -1),
 			NotAfter:  time.Now().Add(time.Hour),
 			PublicKey: certPub,

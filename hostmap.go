@@ -367,7 +367,9 @@ func (hm *HostMap) addHostInfo(hostinfo *HostInfo, f *Interface) {
 
 	f.lightHouse.AddRemoteAndReset(ip, hostinfo.remote)
 	if f.serveDns {
-		dnsR.Add(remoteCert.Details.Name+".", remoteCert.Details.Ips[0].IP.String())
+		for i := range remoteCert.Details.Names {
+			dnsR.Add(remoteCert.Details.Names[i]+".", remoteCert.Details.Ips[0].IP.String())
+		}
 	}
 
 	hm.Hosts[hostinfo.hostId] = hostinfo
@@ -723,7 +725,7 @@ func (i *HostInfo) logger(l *logrus.Logger) *logrus.Entry {
 
 	if connState := i.ConnectionState; connState != nil {
 		if peerCert := connState.peerCert; peerCert != nil {
-			li = li.WithField("certName", peerCert.Details.Name)
+			li = li.WithField("certName", peerCert.Details.Names)
 		}
 	}
 
