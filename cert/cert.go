@@ -343,7 +343,16 @@ func (nc *NebulaCertificate) String() string {
 
 	s := "NebulaCertificate {\n"
 	s += "\tDetails {\n"
-	s += fmt.Sprintf("\t\tNames: %v\n", nc.Details.Names)
+
+	if len(nc.Details.Names) > 0 {
+		s += "\t\tNames: [\n"
+		for _, name := range nc.Details.Names {
+			s += fmt.Sprintf("\t\t\t%v\n", name)
+		}
+		s += "\t\t]\n"
+	} else {
+		s += "\t\tNames: []\n"
+	}
 
 	if len(nc.Details.Ips) > 0 {
 		s += "\t\tIps: [\n"
