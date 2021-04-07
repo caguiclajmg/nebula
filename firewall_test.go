@@ -161,7 +161,7 @@ func TestFirewall_Drop(t *testing.T) {
 
 	c := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:           "host1",
+			Names:          []string{"host1"},
 			Ips:            []*net.IPNet{&ipNet},
 			Groups:         []string{"default-group"},
 			InvertedGroups: map[string]struct{}{"default-group": {}},
@@ -207,14 +207,14 @@ func TestFirewall_Drop(t *testing.T) {
 	assert.NoError(t, fw.Drop([]byte{}, p, true, &h, cp, nil))
 
 	// ensure ca name doesn't get in the way of group checks
-	cp.CAs["signer-shasum"] = &cert.NebulaCertificate{Details: cert.NebulaCertificateDetails{Name: "ca-good"}}
+	cp.CAs["signer-shasum"] = &cert.NebulaCertificate{Details: cert.NebulaCertificateDetails{Names: []string{"ca-good"}}}
 	fw = NewFirewall(l, time.Second, time.Minute, time.Hour, &c)
 	assert.Nil(t, fw.AddRule(true, fwProtoAny, 0, 0, []string{"nope"}, "", nil, "ca-good", ""))
 	assert.Nil(t, fw.AddRule(true, fwProtoAny, 0, 0, []string{"default-group"}, "", nil, "ca-good-bad", ""))
 	assert.Equal(t, fw.Drop([]byte{}, p, true, &h, cp, nil), ErrNoMatchingRule)
 
 	// test caName doesn't drop on match
-	cp.CAs["signer-shasum"] = &cert.NebulaCertificate{Details: cert.NebulaCertificateDetails{Name: "ca-good"}}
+	cp.CAs["signer-shasum"] = &cert.NebulaCertificate{Details: cert.NebulaCertificateDetails{Names: []string{"ca-good"}}}
 	fw = NewFirewall(l, time.Second, time.Minute, time.Hour, &c)
 	assert.Nil(t, fw.AddRule(true, fwProtoAny, 0, 0, []string{"nope"}, "", nil, "ca-good-bad", ""))
 	assert.Nil(t, fw.AddRule(true, fwProtoAny, 0, 0, []string{"default-group"}, "", nil, "ca-good", ""))
@@ -253,7 +253,7 @@ func BenchmarkFirewallTable_match(b *testing.B) {
 		c := &cert.NebulaCertificate{
 			Details: cert.NebulaCertificateDetails{
 				InvertedGroups: map[string]struct{}{"nope": {}},
-				Name:           "nope",
+				Names:          []string{"nope"},
 				Ips:            []*net.IPNet{ip},
 			},
 		}
@@ -266,7 +266,7 @@ func BenchmarkFirewallTable_match(b *testing.B) {
 		c := &cert.NebulaCertificate{
 			Details: cert.NebulaCertificateDetails{
 				InvertedGroups: map[string]struct{}{"good-group": {}},
-				Name:           "nope",
+				Names:          []string{"nope"},
 			},
 		}
 		for n := 0; n < b.N; n++ {
@@ -278,7 +278,7 @@ func BenchmarkFirewallTable_match(b *testing.B) {
 		c := &cert.NebulaCertificate{
 			Details: cert.NebulaCertificateDetails{
 				InvertedGroups: map[string]struct{}{"nope": {}},
-				Name:           "good-host",
+				Names:          []string{"good-host"},
 			},
 		}
 		for n := 0; n < b.N; n++ {
@@ -291,7 +291,7 @@ func BenchmarkFirewallTable_match(b *testing.B) {
 		c := &cert.NebulaCertificate{
 			Details: cert.NebulaCertificateDetails{
 				InvertedGroups: map[string]struct{}{"nope": {}},
-				Name:           "good-host",
+				Names:          []string{"good-host"},
 			},
 		}
 		for n := 0; n < b.N; n++ {
@@ -306,7 +306,7 @@ func BenchmarkFirewallTable_match(b *testing.B) {
 		c := &cert.NebulaCertificate{
 			Details: cert.NebulaCertificateDetails{
 				InvertedGroups: map[string]struct{}{"nope": {}},
-				Name:           "good-host",
+				Names:          []string{"good-host"},
 			},
 		}
 		for n := 0; n < b.N; n++ {
@@ -336,7 +336,7 @@ func TestFirewall_Drop2(t *testing.T) {
 
 	c := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:           "host1",
+			Names:          []string{"host1"},
 			Ips:            []*net.IPNet{&ipNet},
 			InvertedGroups: map[string]struct{}{"default-group": {}, "test-group": {}},
 		},
@@ -351,7 +351,7 @@ func TestFirewall_Drop2(t *testing.T) {
 
 	c1 := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:           "host1",
+			Names:          []string{"host1"},
 			Ips:            []*net.IPNet{&ipNet},
 			InvertedGroups: map[string]struct{}{"default-group": {}, "test-group-not": {}},
 		},
@@ -395,14 +395,14 @@ func TestFirewall_Drop3(t *testing.T) {
 
 	c := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name: "host-owner",
-			Ips:  []*net.IPNet{&ipNet},
+			Names: []string{"host-owner"},
+			Ips:   []*net.IPNet{&ipNet},
 		},
 	}
 
 	c1 := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:   "host1",
+			Names:  []string{"host1"},
 			Ips:    []*net.IPNet{&ipNet},
 			Issuer: "signer-sha-bad",
 		},
@@ -417,7 +417,7 @@ func TestFirewall_Drop3(t *testing.T) {
 
 	c2 := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:   "host2",
+			Names:  []string{"host2"},
 			Ips:    []*net.IPNet{&ipNet},
 			Issuer: "signer-sha",
 		},
@@ -432,7 +432,7 @@ func TestFirewall_Drop3(t *testing.T) {
 
 	c3 := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:   "host3",
+			Names:  []string{"host3"},
 			Ips:    []*net.IPNet{&ipNet},
 			Issuer: "signer-sha-bad",
 		},
@@ -481,7 +481,7 @@ func TestFirewall_DropConntrackReload(t *testing.T) {
 
 	c := cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:           "host1",
+			Names:          []string{"host1"},
 			Ips:            []*net.IPNet{&ipNet},
 			Groups:         []string{"default-group"},
 			InvertedGroups: map[string]struct{}{"default-group": {}},

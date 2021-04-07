@@ -47,20 +47,20 @@ func (ncp *NebulaCAPool) AddCACertificate(pemBytes []byte) ([]byte, error) {
 	}
 
 	if !c.Details.IsCA {
-		return pemBytes, fmt.Errorf("provided certificate was not a CA; %s", c.Details.Name)
+		return pemBytes, fmt.Errorf("provided certificate was not a CA; %v", c.Details.Names)
 	}
 
 	if !c.CheckSignature(c.Details.PublicKey) {
-		return pemBytes, fmt.Errorf("provided certificate was not self signed; %s", c.Details.Name)
+		return pemBytes, fmt.Errorf("provided certificate was not self signed; %v", c.Details.Names)
 	}
 
 	if c.Expired(time.Now()) {
-		return pemBytes, fmt.Errorf("provided CA certificate is expired; %s", c.Details.Name)
+		return pemBytes, fmt.Errorf("provided CA certificate is expired; %v", c.Details.Names)
 	}
 
 	sum, err := c.Sha256Sum()
 	if err != nil {
-		return pemBytes, fmt.Errorf("could not calculate shasum for provided CA; error: %s; %s", err, c.Details.Name)
+		return pemBytes, fmt.Errorf("could not calculate shasum for provided CA; error: %s; %v", err, c.Details.Names)
 	}
 
 	ncp.CAs[sum] = c

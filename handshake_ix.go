@@ -103,7 +103,7 @@ func ixHandshakeStage1(f *Interface, addr *udpAddr, packet []byte, h *Header) {
 		return
 	}
 	vpnIP := ip2int(remoteCert.Details.Ips[0].IP)
-	certName := remoteCert.Details.Name
+	certName := remoteCert.Details.Names
 	fingerprint, _ := remoteCert.Sha256Sum()
 
 	if vpnIP == ip2int(f.certState.certificate.Details.Ips[0].IP) {
@@ -331,7 +331,7 @@ func ixHandshakeStage2(f *Interface, addr *udpAddr, hostinfo *HostInfo, packet [
 	}
 
 	vpnIP := ip2int(remoteCert.Details.Ips[0].IP)
-	certName := remoteCert.Details.Name
+	certName := remoteCert.Details.Names
 	fingerprint, _ := remoteCert.Sha256Sum()
 
 	if vpnIP != hostinfo.hostId {

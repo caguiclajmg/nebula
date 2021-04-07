@@ -22,7 +22,7 @@ func TestMarshalingNebulaCertificate(t *testing.T) {
 
 	nc := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "testing",
+			Names: []string{"testing"},
 			Ips: []*net.IPNet{
 				{IP: net.ParseIP("10.1.1.1"), Mask: net.IPMask(net.ParseIP("255.255.255.0"))},
 				{IP: net.ParseIP("10.1.1.2"), Mask: net.IPMask(net.ParseIP("255.255.0.0"))},
@@ -51,7 +51,7 @@ func TestMarshalingNebulaCertificate(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, nc.Signature, nc2.Signature)
-	assert.Equal(t, nc.Details.Name, nc2.Details.Name)
+	assert.Equal(t, nc.Details.Names, nc2.Details.Names)
 	assert.Equal(t, nc.Details.NotBefore, nc2.Details.NotBefore)
 	assert.Equal(t, nc.Details.NotAfter, nc2.Details.NotAfter)
 	assert.Equal(t, nc.Details.PublicKey, nc2.Details.PublicKey)
@@ -78,7 +78,7 @@ func TestNebulaCertificate_Sign(t *testing.T) {
 
 	nc := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "testing",
+			Names: []string{"testing"},
 			Ips: []*net.IPNet{
 				{IP: net.ParseIP("10.1.1.1"), Mask: net.IPMask(net.ParseIP("255.255.255.0"))},
 				{IP: net.ParseIP("10.1.1.2"), Mask: net.IPMask(net.ParseIP("255.255.0.0"))},
@@ -128,7 +128,7 @@ func TestNebulaCertificate_MarshalJSON(t *testing.T) {
 
 	nc := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "testing",
+			Names: []string{"testing"},
 			Ips: []*net.IPNet{
 				{IP: net.ParseIP("10.1.1.1"), Mask: net.IPMask(net.ParseIP("255.255.255.0"))},
 				{IP: net.ParseIP("10.1.1.2"), Mask: net.IPMask(net.ParseIP("255.255.0.0"))},
@@ -153,7 +153,7 @@ func TestNebulaCertificate_MarshalJSON(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(
 		t,
-		"{\"details\":{\"groups\":[\"test-group1\",\"test-group2\",\"test-group3\"],\"ips\":[\"10.1.1.1/24\",\"10.1.1.2/16\",\"10.1.1.3/ff00ff00\"],\"isCa\":false,\"issuer\":\"1234567890abcedfghij1234567890ab\",\"name\":\"testing\",\"notAfter\":\"0000-11-30T02:00:00Z\",\"notBefore\":\"0000-11-30T01:00:00Z\",\"publicKey\":\"313233343536373839306162636564666768696a313233343536373839306162\",\"subnets\":[\"9.1.1.1/ff00ff00\",\"9.1.1.2/24\",\"9.1.1.3/16\"]},\"fingerprint\":\"26cb1c30ad7872c804c166b5150fa372f437aa3856b04edb4334b4470ec728e4\",\"signature\":\"313233343536373839306162636564666768696a313233343536373839306162\"}",
+		"{\"details\":{\"groups\":[\"test-group1\",\"test-group2\",\"test-group3\"],\"ips\":[\"10.1.1.1/24\",\"10.1.1.2/16\",\"10.1.1.3/ff00ff00\"],\"isCa\":false,\"issuer\":\"1234567890abcedfghij1234567890ab\",\"names\":[\"testing\"],\"notAfter\":\"0000-11-30T02:00:00Z\",\"notBefore\":\"0000-11-30T01:00:00Z\",\"publicKey\":\"313233343536373839306162636564666768696a313233343536373839306162\",\"subnets\":[\"9.1.1.1/ff00ff00\",\"9.1.1.2/24\",\"9.1.1.3/16\"]},\"fingerprint\":\"26cb1c30ad7872c804c166b5150fa372f437aa3856b04edb4334b4470ec728e4\",\"signature\":\"313233343536373839306162636564666768696a313233343536373839306162\"}",
 		string(b),
 	)
 }
@@ -426,25 +426,25 @@ BVG+oJpAoqokUBbI4U0N8CSfpUABEkB/Pm5A2xyH/nc8mg/wvGUWG3pZ7nHzaDMf
 
 	rootCA := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "nebula root ca",
+			Names: []string{"nebula root ca"},
 		},
 	}
 
 	rootCA01 := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "nebula root ca 01",
+			Names: []string{"nebula root ca 01"},
 		},
 	}
 
 	p, err := NewCAPoolFromBytes([]byte(noNewLines))
 	assert.Nil(t, err)
-	assert.Equal(t, p.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Details.Name, rootCA.Details.Name)
-	assert.Equal(t, p.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Details.Name, rootCA01.Details.Name)
+	assert.Equal(t, p.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Details.Names, rootCA.Details.Names)
+	assert.Equal(t, p.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Details.Names, rootCA01.Details.Names)
 
 	pp, err := NewCAPoolFromBytes([]byte(withNewLines))
 	assert.Nil(t, err)
-	assert.Equal(t, pp.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Details.Name, rootCA.Details.Name)
-	assert.Equal(t, pp.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Details.Name, rootCA01.Details.Name)
+	assert.Equal(t, pp.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Details.Names, rootCA.Details.Names)
+	assert.Equal(t, pp.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Details.Names, rootCA01.Details.Names)
 }
 
 func appendByteSlices(b ...[]byte) []byte {
@@ -705,7 +705,7 @@ func TestMarshalingNebulaCertificateConsistency(t *testing.T) {
 
 	nc := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name: "testing",
+			Names: []string{"testing"},
 			Ips: []*net.IPNet{
 				{IP: net.ParseIP("10.1.1.1"), Mask: net.IPMask(net.ParseIP("255.255.255.0"))},
 				{IP: net.ParseIP("10.1.1.2"), Mask: net.IPMask(net.ParseIP("255.255.0.0"))},
@@ -766,7 +766,7 @@ func newTestCaCert(before, after time.Time, ips, subnets []*net.IPNet, groups []
 
 	nc := &NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name:           "test ca",
+			Names:          []string{"test ca"},
 			NotBefore:      time.Unix(before.Unix(), 0),
 			NotAfter:       time.Unix(after.Unix(), 0),
 			PublicKey:      pub,
@@ -831,7 +831,7 @@ func newTestCert(ca *NebulaCertificate, key []byte, before, after time.Time, ips
 
 	nc := &NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name:           "testing",
+			Names:          []string{"testing"},
 			Ips:            ips,
 			Subnets:        subnets,
 			Groups:         groups,

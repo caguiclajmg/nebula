@@ -691,7 +691,13 @@ func (fc *FirewallCA) match(p FirewallPacket, c *cert.NebulaCertificate, caPool 
 		return false
 	}
 
-	return fc.CANames[s.Details.Name].match(p, c)
+	for i := range s.Details.Names {
+		if fc.CANames[s.Details.Names[i]].match(p, c) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (fr *FirewallRule) addRule(groups []string, host string, ip *net.IPNet) error {
@@ -773,8 +779,10 @@ func (fr *FirewallRule) match(p FirewallPacket, c *cert.NebulaCertificate) bool 
 	}
 
 	if fr.Hosts != nil {
-		if _, ok := fr.Hosts[c.Details.Name]; ok {
-			return true
+		for i := range c.Details.Names {
+			if _, ok := fr.Hosts[c.Details.Names[i]]; ok {
+				return true
+			}
 		}
 	}
 

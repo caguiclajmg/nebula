@@ -31,7 +31,7 @@ func TestControl_GetHostInfoByVpnIP(t *testing.T) {
 
 	crt := &cert.NebulaCertificate{
 		Details: cert.NebulaCertificateDetails{
-			Name:           "test",
+			Names:          []string{"test"},
 			Ips:            []*net.IPNet{&ipNet},
 			Subnets:        []*net.IPNet{},
 			Groups:         []string{"default-group"},

@@ -34,7 +34,7 @@ type NebulaCertificate struct {
 }
 
 type NebulaCertificateDetails struct {
-	Name      string
+	Names     []string
 	Ips       []*net.IPNet
 	Subnets   []*net.IPNet
 	Groups    []string
@@ -75,7 +75,7 @@ func UnmarshalNebulaCertificate(b []byte) (*NebulaCertificate, error) {
 
 	nc := NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name:           rc.Details.Name,
+			Names:          make([]string, len(rc.Details.Names)),
 			Groups:         make([]string, len(rc.Details.Groups)),
 			Ips:            make([]*net.IPNet, len(rc.Details.Ips)/2),
 			Subnets:        make([]*net.IPNet, len(rc.Details.Subnets)/2),
@@ -89,6 +89,7 @@ func UnmarshalNebulaCertificate(b []byte) (*NebulaCertificate, error) {
 	}
 
 	copy(nc.Signature, rc.Signature)
+	copy(nc.Details.Names, rc.Details.Names)
 	copy(nc.Details.Groups, rc.Details.Groups)
 	nc.Details.Issuer = hex.EncodeToString(rc.Details.Issuer)
 
@@ -342,7 +343,7 @@ func (nc *NebulaCertificate) String() string {
 
 	s := "NebulaCertificate {\n"
 	s += "\tDetails {\n"
-	s += fmt.Sprintf("\t\tName: %v\n", nc.Details.Name)
+	s += fmt.Sprintf("\t\tNames: %v\n", nc.Details.Names)
 
 	if len(nc.Details.Ips) > 0 {
 		s += "\t\tIps: [\n"
@@ -393,7 +394,7 @@ func (nc *NebulaCertificate) String() string {
 // getRawDetails marshals the raw details into protobuf ready struct
 func (nc *NebulaCertificate) getRawDetails() *RawNebulaCertificateDetails {
 	rd := &RawNebulaCertificateDetails{
-		Name:      nc.Details.Name,
+		Names:     nc.Details.Names,
 		Groups:    nc.Details.Groups,
 		NotBefore: nc.Details.NotBefore.Unix(),
 		NotAfter:  nc.Details.NotAfter.Unix(),
@@ -459,7 +460,7 @@ func (nc *NebulaCertificate) MarshalJSON() ([]byte, error) {
 	fp, _ := nc.Sha256Sum()
 	jc := m{
 		"details": m{
-			"name":      nc.Details.Name,
+			"names":     nc.Details.Names,
 			"ips":       toString(nc.Details.Ips),
 			"subnets":   toString(nc.Details.Subnets),
 			"groups":    nc.Details.Groups,
@@ -489,7 +490,7 @@ func (nc *NebulaCertificate) MarshalJSON() ([]byte, error) {
 func (nc *NebulaCertificate) Copy() *NebulaCertificate {
 	c := &NebulaCertificate{
 		Details: NebulaCertificateDetails{
-			Name:           nc.Details.Name,
+			Names:          make([]string, len(nc.Details.Names)),
 			Groups:         make([]string, len(nc.Details.Groups)),
 			Ips:            make([]*net.IPNet, len(nc.Details.Ips)),
 			Subnets:        make([]*net.IPNet, len(nc.Details.Subnets)),
@@ -504,6 +505,7 @@ func (nc *NebulaCertificate) Copy() *NebulaCertificate {
 	}
 
 	copy(c.Signature, nc.Signature)
+	copy(c.Details.Names, nc.Details.Names)
 	copy(c.Details.Groups, nc.Details.Groups)
 	copy(c.Details.PublicKey, nc.Details.PublicKey)
 
